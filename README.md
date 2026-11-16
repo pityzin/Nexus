@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # NEXUS
 
 **Release status:** the audited source remains version `0.1.0`; the requested v1.0.0 and v2.0.0 milestones are not release-ready. Instruction decoding and Phase 04 advanced analysis are not implemented. See the [release-readiness audit](docs/RELEASE_READINESS.md) for verified scope, test results, limitations, and local artifact checksums.
@@ -73,3 +74,7 @@ Inputs are untrusted data. The loader checks a bounded read-only file snapshot, 
 7. **Later:** ARM64, Haskell/OCaml components, full reporting, and isolated WebAssembly visualization.
 
 See [CHANGELOG.md](CHANGELOG.md) for the current release notes.
+=======
+# Nexus
+**NEXUS** is a high-performance binary analysis and reverse engineering platform featuring advanced disassembly, control flow analysis, cross-referencing, profiling, multi-architecture support, plugins, SDK, CLI, and a modern desktop interface.
+>>>>>>> 83cc6c726fecaad17951621e1a150068b5cc6173
