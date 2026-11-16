@@ -1,0 +1,9 @@
+[package]
+name = "nexus-example-metadata-plugin"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+nexus-plugin-api = { path = "../../../core/rust/nexus-plugin-api" }

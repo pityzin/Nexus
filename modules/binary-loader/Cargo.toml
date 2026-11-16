@@ -1,0 +1,9 @@
+[package]
+name = "nexus-binary-loader"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+nexus-nir = { path = "../../interfaces/nir" }

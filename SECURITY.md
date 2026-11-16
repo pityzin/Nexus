@@ -1,0 +1,13 @@
+# Security policy
+
+NEXUS is a static analysis project. **Analyzed files must never be automatically executed.** Do not add a command, plugin, test fixture, or helper that launches an analyzed program.
+
+Treat file contents, format metadata, offsets, counts, strings, and module metadata as untrusted. Enforce size and count limits before allocation, use checked integer arithmetic for offsets, avoid unchecked pointer access, and keep native interfaces bounded. Fuzz parsers as they are introduced. Native code should remain compatible with compiler sanitizers where supported.
+
+The PE/ELF parser accepts paths only through read-only file access. The loader defaults to 512 MiB per file, has a 2 GiB maximum, checks the opened file size and handles growth during reads, and stores a bounded immutable snapshot. The parser does not memory-map, execute, resolve imports, or make network requests. It checks offsets and table sizes before dereferencing bytes and caps PE sections at 96, PE directories at 16, and ELF header tables at 65,536 entries. Malformed files return errors. The native checksum rejects inputs above 16 MiB. Report a suspected vulnerability privately to the project maintainers; do not include an exploit sample that executes a payload.
+
+`nexus ui` is a loopback-only browser bridge. It binds only to `127.0.0.1:3001` and is reached at `http://localhost:3001`. Port 3001 is fixed; bind conflicts fail without killing processes or selecting a fallback. The server accepts no filesystem paths or shell commands, checks the local `Host` and same-origin `Origin` for binary uploads, rejects transfer-encoded or duplicate-length requests, and caps uploads at 128 MiB or the configured input budget, whichever is lower. Browser-selected file bytes are parsed in memory and never written or executed. The UI uses a restrictive Content Security Policy and renders untrusted strings as text. The parser itself remains offline; the local HTTP transport is used only by the optional UI.
+
+## Plugins
+
+The Rust plugin host accepts trusted, statically linked code only. It passes a small normalized metadata value to a plugin and bounds metadata input size, plugin count, and output bytes. It catches Rust unwinding panics and returns plugin errors to the caller. Plugins execute in the NEXUS process: these limits are not a sandbox, cannot stop a plugin from consuming CPU or allocating independently, and cannot contain native undefined behavior, process termination, or `panic=abort`. Never load plugins from untrusted sources. Dynamic plugin discovery, WASM isolation, and out-of-process workers are not implemented.

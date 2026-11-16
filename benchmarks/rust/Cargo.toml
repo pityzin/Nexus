@@ -1,0 +1,13 @@
+[package]
+name = "nexus-benchmarks"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+nexus-core = { path = "../../core/rust/nexus-core" }
+criterion = "0.5.1"
+
+[[bench]]
+name = "native_interop"
+harness = false

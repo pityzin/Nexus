@@ -1,0 +1,9 @@
+/target/
+/build/
+/out/
+/.vs/
+*.user
+*.suo
+criterion/
+proptest-regressions/
+__pycache__/

@@ -1,0 +1,18 @@
+[workspace]
+resolver = "2"
+members = ["apps/cli", "core/rust/nexus-api", "core/rust/nexus-plugin-api", "core/rust/nexus-plugin-host", "core/rust/nexus-memory", "core/rust/nexus-registry", "core/rust/nexus-core", "core/rust/nexus-profiling", "interfaces/nir", "modules/binary-loader", "examples/plugins/metadata-summary"]
+exclude = ["benchmarks/rust"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+rust-version = "1.82"
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "symbols"

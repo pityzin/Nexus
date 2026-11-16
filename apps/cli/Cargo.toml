@@ -1,0 +1,17 @@
+[package]
+name = "nexus-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "nexus"
+path = "src/main.rs"
+
+[dependencies]
+nexus-api = { path = "../../core/rust/nexus-api" }
+nexus-core = { path = "../../core/rust/nexus-core" }
+nexus-profiling = { path = "../../core/rust/nexus-profiling" }
+nexus-plugin-api = { path = "../../core/rust/nexus-plugin-api" }
+nexus-plugin-host = { path = "../../core/rust/nexus-plugin-host" }
+nexus-example-metadata-plugin = { path = "../../examples/plugins/metadata-summary" }

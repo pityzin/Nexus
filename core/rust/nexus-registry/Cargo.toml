@@ -1,0 +1,8 @@
+[package]
+name = "nexus-registry"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+nexus-api = { path = "../nexus-api" }

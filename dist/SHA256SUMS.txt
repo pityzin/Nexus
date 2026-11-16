@@ -1,0 +1,3 @@
+521fcbe9ffd7996217e3fe5c38bb776377febb887a5fb65d7df3b18725200ec9  nexus.exe  463872 bytes
+eb1ee979bf02324712346e5bdbfc59c785388bc50d18cc2688aae4b0734915a0  vcruntime140.dll  176488 bytes
+59209f600ebbdc2daee782b1042b5cee378d19b53f04bb8c633acd19f5df1bbf  nexus-0.1.0-windows-x64-portable.zip  289358 bytes

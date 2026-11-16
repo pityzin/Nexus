@@ -1,0 +1,10 @@
+{
+  "name": "@nexus/static-workbench",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "cargo run --manifest-path ../../Cargo.toml -p nexus-cli -- ui",
+    "start": "cargo run --manifest-path ../../Cargo.toml -p nexus-cli -- ui",
+    "test": "node --test tests/*.test.js"
+  }
+}

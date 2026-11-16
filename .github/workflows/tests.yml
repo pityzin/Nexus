@@ -1,0 +1,49 @@
+name: Tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            target: x86_64-pc-windows-msvc
+          - os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+          - os: macos-latest
+            target: aarch64-apple-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+        with:
+          arch: x64
+      - name: Rust unit and C ABI integration tests
+        run: cargo test --workspace --target ${{ matrix.target }}
+      - name: Build CLI for black-box checks
+        run: cargo build -p nexus-cli --target ${{ matrix.target }}
+      - name: Configure native tests (Windows)
+        if: runner.os == 'Windows'
+        run: cmake -S . -B build/native -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+      - name: Configure native tests (non-Windows)
+        if: runner.os != 'Windows'
+        run: cmake -S . -B build/native -DBUILD_TESTING=ON
+      - name: Build native library and test executable
+        run: cmake --build build/native --config Release
+      - name: Run native tests
+        run: ctest --test-dir build/native -C Release --output-on-failure
+      - name: CLI smoke tests
+        shell: pwsh
+        run: |
+          $binary = if ($IsWindows) { 'nexus.exe' } else { 'nexus' }
+          $env:NEXUS_BIN = (Resolve-Path "target/${{ matrix.target }}/debug/$binary").Path
+          python -m unittest discover -s tools/python -v

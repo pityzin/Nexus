@@ -1,0 +1,32 @@
+name: Benchmarks
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 4 * * 1"
+permissions:
+  contents: read
+jobs:
+  criterion:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Record environment
+        shell: pwsh
+        run: |
+          Get-CimInstance Win32_Processor | Select-Object -First 1 Name
+          rustc --version --verbose
+          cmake --version
+          cl 2>&1 | Select-Object -First 1
+      - name: Run Criterion benchmark
+        run: cargo bench --manifest-path benchmarks/rust/Cargo.toml --bench native_interop --target x86_64-pc-windows-msvc
+      - uses: actions/upload-artifact@v4
+        with:
+          name: criterion-windows-x64
+          path: target/x86_64-pc-windows-msvc/criterion
+          if-no-files-found: warn

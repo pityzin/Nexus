@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>NEXUS â€” Static Binary Workbench</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="#overview" data-view-link="overview" aria-label="NEXUS overview">
+        <span class="brand-mark">N</span>
+        <span><strong>NEXUS</strong><small>STATIC WORKBENCH</small></span>
+      </a>
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="nav-list">
+        <button class="nav-item active" data-view-link="overview"><span class="nav-icon">â—«</span>Overview</button>
+        <button class="nav-item" data-view-link="binary"><span class="nav-icon">â–¤</span>Binary explorer</button>
+        <button class="nav-item" data-view-link="nir"><span class="nav-icon">âŒ˜</span>NIR metadata</button>
+        <button class="nav-item" data-view-link="performance"><span class="nav-icon">âŒ</span>Performance</button>
+        <button class="nav-item" data-view-link="plugins"><span class="nav-icon">P</span>Plugins</button>
+      </nav>
+      <div class="nav-label nav-label-spaced">ANALYSIS</div>
+      <nav class="nav-list">
+        <button class="nav-item unavailable" disabled title="Instruction engine is not implemented"><span class="nav-icon">â‰‹</span>Disassembly <span class="soon">Unavailable</span></button>
+        <button class="nav-item unavailable" disabled title="CFG analysis is not implemented"><span class="nav-icon">â—‡</span>Control flow <span class="soon">Unavailable</span></button>
+        <button class="nav-item unavailable" disabled title="Symbol and cross-reference analysis is not implemented"><span class="nav-icon">âŒ•</span>Symbols &amp; xrefs <span class="soon">Unavailable</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="connection-indicator"><span id="connection-dot" class="dot pending"></span><span id="connection-label">Connecting to local engine</span></div>
+        <div class="sidebar-foot">Offline analysis Â· no binary execution</div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="breadcrumbs"><span>Workspace</span><span class="crumb-sep">/</span><strong id="current-view-label">Overview</strong></div>
+        <div class="top-actions">
+          <span class="local-badge"><span class="dot"></span>LOCAL ONLY</span>
+          <button class="button button-primary button-small" id="open-file-top">Open binary <span aria-hidden="true">ï¼‹</span></button>
+        </div>
+      </header>
+
+      <div class="content-wrap">
+        <div id="global-error" class="alert alert-error" role="alert" hidden></div>
+        <section class="view active-view" id="view-overview" aria-labelledby="page-title">
+          <div class="page-heading">
+            <div><div class="eyebrow">ANALYSIS WORKSPACE</div><h1 id="page-title">Overview</h1><p class="page-subtitle">Inspect executable metadata in a local, static-analysis session.</p></div>
+            <div class="heading-meta"><span class="status-pill"><span class="dot"></span>ENGINE <span id="engine-version">â€”</span></span></div>
+          </div>
+          <div class="welcome-card">
+            <div class="welcome-copy"><div class="eyebrow accent">STATIC ANALYSIS Â· PE / ELF</div><h2 id="welcome-title">Start with a binary</h2><p id="welcome-copy">Choose a file to inspect its headers and sections. NEXUS reads the file as data and never launches it.</p><button class="button button-primary" id="open-file-main">Select a binary <span aria-hidden="true">â†—</span></button></div>
+            <div class="welcome-art" aria-hidden="true"><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div><div class="art-core">N</div><span class="art-node node-a">PE</span><span class="art-node node-b">ELF</span><span class="art-node node-c">NIR</span></div>
+          </div>
+          <div class="metric-grid">
+            <article class="metric-card"><div class="metric-label">CURRENT FILE</div><div class="metric-value" id="overview-file">No file loaded</div><div class="metric-foot" id="overview-size">Select a PE or ELF binary</div></article>
+            <article class="metric-card"><div class="metric-label">FORMAT</div><div class="metric-value" id="overview-format">â€”</div><div class="metric-foot" id="overview-architecture">Architecture unavailable</div></article>
+            <article class="metric-card"><div class="metric-label">SECTIONS</div><div class="metric-value" id="overview-sections">â€”</div><div class="metric-foot">Parsed from the input section table</div></article>
+            <article class="metric-card"><div class="metric-label">PARSE WALL TIME</div><div class="metric-value" id="overview-time">â€”</div><div class="metric-foot">Measured by the local Rust parser</div></article>
+          </div>
+          <div class="content-grid overview-grid">
+            <article class="panel"><div class="panel-heading"><div><div class="eyebrow">ENGINE CAPABILITIES</div><h2>Available in this build</h2></div><span class="panel-icon">â—ˆ</span></div><div id="capability-list" class="capability-list"><div class="empty-inline">Checking engine capabilitiesâ€¦</div></div></article>
+            <article class="panel"><div class="panel-heading"><div><div class="eyebrow">RECENT SESSION</div><h2>Local activity</h2></div><span class="panel-icon">â—·</span></div><div id="recent-sessions" class="recent-list"><div class="empty-state compact"><span class="empty-symbol">âŒ</span><strong>No analyses yet</strong><span>Imported files stay in this tab only.</span></div></div></article>
+          </div>
+          <div class="notice"><span class="notice-icon">i</span><span>Disassembly, control-flow graphs, symbols, relocations, and cross-references are not implemented by the current engine. This interface does not simulate them.</span></div>
+        </section>
+
+        <section class="view" id="view-binary" aria-labelledby="binary-title" hidden>
+          <div class="page-heading"><div><div class="eyebrow">PE / ELF METADATA</div><h1 id="binary-title">Binary explorer</h1><p class="page-subtitle">Headers, entry point, and section layout from the actual parser output.</p></div><div class="heading-meta"><button class="button button-quiet" id="export-metadata" disabled>Export metadata JSON <span aria-hidden="true">â†“</span></button></div></div>
+          <div id="binary-empty" class="panel empty-state large"><span class="empty-symbol">â–¤</span><strong>No binary loaded</strong><span>Choose a file to inspect its parsed metadata.</span><button class="button button-primary" id="open-file-empty">Select a binary</button></div>
+          <div id="binary-content" hidden>
+            <div class="metadata-grid" id="metadata-cards"></div>
+            <article class="panel section-panel">
+              <div class="panel-heading section-heading"><div><div class="eyebrow">SECTION TABLE</div><h2>Sections <span class="count-badge" id="section-count">0</span></h2></div><label class="search-box"><span aria-hidden="true">âŒ•</span><input id="section-search" type="search" placeholder="Filter name, address, permissions" aria-label="Filter sections"></label></div>
+              <div class="table-scroll"><table><thead><tr><th>INDEX</th><th>NAME</th><th>VIRTUAL ADDRESS</th><th>VIRTUAL SIZE</th><th>FILE OFFSET</th><th>RAW SIZE</th><th>PERMISSIONS</th></tr></thead><tbody id="sections-body"></tbody></table></div>
+              <div class="table-footer"><span id="section-page-label">No sections</span><div class="pager"><button class="button button-quiet button-small" id="section-prev" disabled>Previous</button><button class="button button-quiet button-small" id="section-next" disabled>Next</button></div></div>
+            </article>
+            <article class="panel headers-panel"><div class="panel-heading"><div><div class="eyebrow">FORMAT-SPECIFIC FIELDS</div><h2>Parsed headers</h2></div></div><div id="header-fields" class="header-fields"></div></article>
+          </div>
+        </section>
+
+        <section class="view" id="view-nir" aria-labelledby="nir-title" hidden>
+          <div class="page-heading"><div><div class="eyebrow">VERSIONED CONTRACT</div><h1 id="nir-title">NIR metadata</h1><p class="page-subtitle">Format-neutral metadata returned by NIR schema v1.</p></div><div class="heading-meta"><span class="status-pill">SCHEMA v1</span></div></div>
+          <article id="nir-empty" class="panel empty-state large"><span class="empty-symbol">âŒ˜</span><strong>Load a binary to inspect NIR</strong><span>Instruction-level NIR is not available because the instruction engine is not implemented.</span></article>
+          <article id="nir-content" class="panel code-panel" hidden><div class="panel-heading"><div><div class="eyebrow">SOURCE MAPPING</div><h2>BinaryMetadata</h2></div><button class="button button-quiet button-small" id="copy-nir">Copy JSON</button></div><pre id="nir-json" class="json-view"></pre></article>
+        </section>
+
+        <section class="view" id="view-performance" aria-labelledby="performance-title" hidden>
+          <div class="page-heading"><div><div class="eyebrow">MEASURED WORKLOADS</div><h1 id="performance-title">Performance</h1><p class="page-subtitle">Live parser timing and imported benchmark reports. No generated sample data.</p></div><div class="heading-meta"><label class="button button-primary file-button">Import benchmark JSON<input id="report-files" type="file" accept="application/json,.json" multiple hidden></label></div></div>
+          <div class="content-grid performance-grid">
+            <article class="panel"><div class="panel-heading"><div><div class="eyebrow">CURRENT SESSION</div><h2>Parser timing</h2></div><span class="panel-icon">âŒ</span></div><div id="profile-empty" class="empty-inline">Load a PE or ELF file to record an actual parse duration.</div><div id="profile-live" class="profile-stage-list" hidden></div><div class="metric-foot profile-limit">Memory usage and allocator event tracking are not exposed by the engine.</div></article>
+            <article class="panel"><div class="panel-heading"><div><div class="eyebrow">REPORT FILES</div><h2>Imported benchmarks</h2></div><button class="button button-quiet button-small" id="clear-reports" disabled>Clear</button></div><div id="reports-empty" class="empty-inline">Import a NEXUS benchmark JSON report to view measured samples.</div><div id="reports-list" class="reports-list"></div></article>
+          </div>
+          <article class="panel reports-table-panel"><div class="panel-heading"><div><div class="eyebrow">SAVED MEASUREMENTS</div><h2>Report details</h2></div><span class="small-muted">Comparison requires matching workload and host metadata.</span></div><div class="table-scroll"><table><thead><tr><th>REPORT</th><th>WORKLOAD</th><th>SAMPLES</th><th>MEDIAN</th><th>MEAN</th><th>ENVIRONMENT</th></tr></thead><tbody id="reports-body"></tbody></table></div><div id="comparison-results" class="comparison-list"></div></article>
+          <div class="notice"><span class="notice-icon">i</span><span>Timing samples vary with scheduling and machine load. Regression labels are candidates based on report confidence intervals; they are not proof of a code change effect.</span></div>
+        </section>
+
+        <section class="view" id="view-plugins" aria-labelledby="plugins-title" hidden>
+          <div class="page-heading"><div><div class="eyebrow">TRUSTED RUST EXTENSIONS</div><h1 id="plugins-title">Plugin exports</h1><p class="page-subtitle">Discover and run metadata exporters registered by this NEXUS build.</p></div></div>
+          <article class="panel"><div class="panel-heading"><div><div class="eyebrow">PLUGIN API</div><h2>Available extensions <span class="count-badge" id="plugin-count">0</span></h2></div><span class="status-pill" id="plugin-api-version">API unavailable</span></div><div id="plugin-list" class="plugin-list"><div class="empty-inline">Loading plugin registry...</div></div></article>
+          <article class="panel plugin-run-panel"><div class="panel-heading"><div><div class="eyebrow">METADATA EXPORT</div><h2>Metadata summary</h2></div><div class="heading-meta"><button class="button button-quiet" id="download-plugin-result" disabled>Download JSON</button><button class="button button-primary" id="run-metadata-plugin" disabled>Run on loaded binary</button></div></div><div id="plugin-run-empty" class="empty-inline">Load a PE or ELF file before running the exporter.</div><pre id="plugin-result" class="json-view" hidden></pre></article>
+          <div class="notice"><span class="notice-icon">!</span><span>Plugins execute as trusted in-process Rust code. The current host does not sandbox plugins or load external plugin files.</span></div>
+        </section>
+        <div id="upload-status" class="upload-status" role="status" aria-live="polite" hidden><div class="upload-title"><strong id="upload-label">Reading file</strong><button class="button button-quiet button-small" id="cancel-upload">Cancel</button></div><progress id="upload-progress" class="progress-track" max="100" value="0" aria-label="Binary upload progress"></progress><span id="upload-detail" class="small-muted"></span></div>
+        <footer class="page-footer"><span>NEXUS Â· static analysis only</span><span id="footer-engine">Local engine status pending</span></footer>
+      </div>
+    </main>
+  </div>
+  <input id="binary-file" type="file" accept=".exe,.dll,.sys,.ocx,.efi,.pe,.elf,.so,.bin" hidden>
+</body>
+</html>
